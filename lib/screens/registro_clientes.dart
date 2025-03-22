@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';  // Para dar formato a las fechas
-import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';  // Para el selector de fechas
+import 'package:intl/intl.dart';
 
 class RegistroClienteScreen extends StatefulWidget {
   const RegistroClienteScreen({super.key});
@@ -35,6 +34,55 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
     _telefonoController.dispose();
     _codigoController.dispose();
     super.dispose();
+  }
+
+  Future<void> _seleccionarFecha(BuildContext context, Function(DateTime) onSelected) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+      locale: const Locale('es', 'ES'),
+    );
+
+    if (pickedDate != null && pickedDate != _fechaPago && pickedDate != _fechaExpiracion) {
+      setState(() {
+        onSelected(pickedDate);
+      });
+    }
+  }
+
+  void _registrarCliente() {
+    if (_formKey.currentState!.validate()) {
+      // Validar que la fecha de expiración sea posterior a la fecha de pago
+      if (_fechaExpiracion != null && _fechaPago != null && _fechaExpiracion!.isBefore(_fechaPago!)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('La fecha de expiración debe ser posterior a la fecha de pago.'),
+          ),
+        );
+        return; // Salir de la función si la validación falla
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Cliente registrado'),
+        ),
+      );
+
+      // Incrementa el código para el siguiente cliente
+      setState(() {
+        _codigoCliente++;
+        _codigoController.text = _codigoCliente.toString().padLeft(3, '0');
+        // Limpiar los campos después de registrar
+        _nombreController.clear();
+        _apellidoController.clear();
+        _telefonoController.clear();
+        _pagoSeleccionado = 'Dia';
+        _fechaPago = null;
+        _fechaExpiracion = null;
+      });
+    }
   }
 
   @override
@@ -84,7 +132,7 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
                 value: _pagoSeleccionado,
                 onChanged: (newValue) {
                   setState(() {
-                    _pagoSeleccionado = newValue!;
+                    _pagoSeleccionado = newValue ;
                   });
                 },
                 items: ['Dia', 'Semana', 'Mes'].map((tipo) {
@@ -105,44 +153,21 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
                 title: Text(
                     'Fecha de Pago: ${_fechaPago != null ? DateFormat('yyyy-MM-dd').format(_fechaPago!) : 'Seleccionar'}'),
                 trailing: const Icon(Icons.calendar_today),
-                onTap: () {
-                  DatePicker.showDatePicker(context,
-                      showTitleActions: true, onConfirm: (date) {
-                    setState(() {
-                      _fechaPago = date;
-                    });
-                  }, currentTime: DateTime.now(), locale: LocaleType.es);
-                },
+                onTap: () => _seleccionarFecha(context, (date) {
+                  _fechaPago = date;
+                }),
               ),
               ListTile(
                 title: Text(
                     'Fecha de Expiración: ${_fechaExpiracion != null ? DateFormat('yyyy-MM-dd').format(_fechaExpiracion!) : 'Seleccionar'}'),
                 trailing: const Icon(Icons.calendar_today),
-                onTap: () {
-                  DatePicker.showDatePicker(context,
-                      showTitleActions: true, onConfirm: (date) {
-                    setState(() {
-                      _fechaExpiracion = date;
-                    });
-                  }, currentTime: DateTime.now(), locale: LocaleType.es);
-                },
+                onTap: () => _seleccionarFecha(context, (date) {
+                  _fechaExpiracion = date;
+                }),
               ),
               ElevatedButton(
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Aquí iría la lógica para registrar al cliente en la base de datos
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Cliente registrado'),
-                      ),
-                    );
-
-                    // Incrementa el código para el siguiente cliente
-                    setState(() {
-                      _codigoCliente++;
-                      _codigoController.text = _codigoCliente.toString().padLeft(3, '0');
-                    });
-                  }
+                  _registrarCliente();
                 },
                 child: const Text('Registrar Cliente'),
               ),
