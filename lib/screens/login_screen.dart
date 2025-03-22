@@ -20,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
         decoration: BoxDecoration(
           image: DecorationImage(
             image: AssetImage('assets/background.png'),
-            fit: BoxFit.cover, 
+            fit: BoxFit.cover,
           ),
         ),
         child: Padding(
@@ -28,8 +28,27 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/logo.png', width: 120),
-              const SizedBox(height: 20),
+              Image.asset(
+                'assets/logo.png',
+                height: 190,
+                frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      boxShadow: [
+                        BoxShadow(
+                          // ignore: deprecated_member_use
+                          color: Colors.black.withOpacity(0.6),
+                          spreadRadius: 2,
+                          blurRadius: 20,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
+                    ),
+                    child: child,
+                  );
+                },
+              ),
+              const SizedBox(height: 35),
               TextField(
                 controller: emailController,
                 decoration: const InputDecoration(
@@ -62,16 +81,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   // autenticación con Firebase (pendiente)
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
-                child: const Text("Iniciar Sesión", style: TextStyle(color: Colors.black)),
+                child: const Text("Iniciar Sesión",
+                    style: TextStyle(color: Colors.black)),
               ),
               const SizedBox(height: 20),
-              const Text("¿No eres miembro?", style: TextStyle(color: Colors.white)),
+              const Text("¿No eres miembro?",
+                  style: TextStyle(color: Colors.white)),
               TextButton(
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => const RegisterScreen()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const RegisterScreen()));
                 },
-                child: const Text("Únete a nosotros", style: TextStyle(color: Colors.yellow)),
+                child: const Text("Únete a nosotros",
+                    style: TextStyle(color: Colors.yellow)),
               ),
             ],
           ),
