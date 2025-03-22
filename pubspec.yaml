@@ -9,10 +9,13 @@ environment:
   sdk: ">=2.18.0 <3.0.0"
 
 dependencies:
+  fluttertoast: ^8.2.12
+  firebase_auth: ^5.5.1
+  firebase_core: ^3.12.1
   flutter:
     sdk: flutter
   intl: ^0.20.2 
-  # flutter_datetime_picker: ^1.5.1 # Actualizar a la versión más reciente
+  
 
 dev_dependencies:
   flutter_test:

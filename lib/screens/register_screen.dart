@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_gym/services/auth_device.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -59,11 +60,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
-                // Registro con Firebase (pendiente)
+              onPressed: () async {
+                await AuthService().signup(
+                      email: emailController.text,
+                      password: passwordController.text, context: context);
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
-              child: const Text("Register", style: TextStyle(color: Colors.black)),
+              child: const Text("Registrar", style: TextStyle(color: Colors.black)),
             ),
           ],
         ),

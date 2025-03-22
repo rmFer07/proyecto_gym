@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto_gym/services/auth_device.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -77,8 +78,11 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  // autenticación con Firebase (pendiente)
+                onPressed: () async{
+                  await AuthService().signin(
+                    email: emailController.text,
+                    password: passwordController.text,
+                    context: context);
                 },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
                 child: const Text("Iniciar Sesión",
