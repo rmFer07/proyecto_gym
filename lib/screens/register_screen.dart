@@ -5,7 +5,7 @@ class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  
+
   // ignore: library_private_types_in_public_api
   _RegisterScreenState createState() => _RegisterScreenState();
 }
@@ -62,11 +62,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ElevatedButton(
               onPressed: () async {
                 await AuthService().signup(
-                      email: emailController.text,
-                      password: passwordController.text, context: context);
+                    email: emailController.text,
+                    password: passwordController.text,
+                    context: context);
               },
               style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
-              child: const Text("Registrar", style: TextStyle(color: Colors.black)),
+              child: const Text("Registrar",
+                  style: TextStyle(color: Colors.black)),
             ),
           ],
         ),
