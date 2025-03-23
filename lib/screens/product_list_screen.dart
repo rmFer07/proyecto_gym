@@ -1,59 +1,57 @@
 import 'package:flutter/material.dart';
-import 'carrito_de_compras.dart';
 import 'product_detail_screen.dart';
+import 'models/product.dart' as product_model; // Usamos el alias product_model
 
 class ProductListScreen extends StatelessWidget {
-  final List<Product> products = [
-    Product(
-      id: '1',
-      name: 'Proteína en Polvo',
-      description: 'Proteína de suero de leche para ganar masa muscular.',
-      price: 25.99,
-      imageUrl: 'assets/proteina.png', // Ruta de la imagen
-    ),
-    Product(
-      id: '2',
-      name: 'Creatina',
-      description: 'Suplemento para mejorar el rendimiento deportivo.',
-      price: 19.99,
-      imageUrl: 'assets/creatina.png', // Ruta de la imagen
-    ),
-    Product(
-      id: '3',
-      name: 'BCAA',
-      description:
-          'Aminoácidos de cadena ramificada para recuperación muscular.',
-      price: 15.99,
-      imageUrl: 'assets/Bcaa.png', // Ruta de la imagen
-    ),
-  ];
-
   ProductListScreen({super.key});
+
+  // Definir la lista de productos usando la clase del modelo correcto.
+  final List<product_model.Product> products = [
+    product_model.Product(
+      id: '1',
+      name: 'Producto 1',
+      description: 'Descripción del Producto 1',
+      price: 10.0,
+      imageUrl: 'assets/placeholder.png',
+    ),
+    product_model.Product(
+      id: '2',
+      name: 'Producto 2',
+      description: 'Descripción del Producto 2',
+      price: 20.0,
+      imageUrl: 'assets/placeholder.png',
+    ),
+    // Agrega más productos según necesites.
+  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Productos'),
+        title: const Text('Lista de Productos'),
+        backgroundColor: Colors.black,
+        centerTitle: true,
       ),
       body: ListView.builder(
         itemCount: products.length,
-        itemBuilder: (ctx, index) {
+        itemBuilder: (context, index) {
+          final product = products[index];
           return ListTile(
             leading: Image.asset(
-              products[index].imageUrl, // Usa la imagen del producto
+              product.imageUrl,
               width: 50,
               height: 50,
               fit: BoxFit.cover,
             ),
-            title: Text(products[index].name),
-            subtitle: Text('\$${products[index].price.toStringAsFixed(2)}'),
+            title: Text(product.name),
+            subtitle: Text('\$${product.price.toStringAsFixed(2)}'),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) =>
-                      ProductDetailScreen(product: products[index]),
+                  builder: (context) => ProductDetailScreen(
+                    product: product, // Aquí se usa el product_model.Product
+                  ),
                 ),
               );
             },

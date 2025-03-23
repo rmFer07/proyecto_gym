@@ -1,0 +1,2 @@
+C:/Users/bc592/Desktop/proyecto_gym/proyecto_gym/android/app/.cxx/RelWithDebInfo/636s4u6n/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/bc592/Desktop/proyecto_gym/proyecto_gym/android/app/.cxx/RelWithDebInfo/636s4u6n/x86_64/CMakeFiles/rebuild_cache.dir

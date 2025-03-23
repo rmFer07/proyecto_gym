@@ -9,18 +9,19 @@ import 'screens/registro_clientes.dart';
 import 'screens/carrito_de_compras.dart';
 import 'screens/product_list_screen.dart';
 import 'screens/product_detail_screen.dart';
+import 'screens/models/product.dart' as product_model;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
-);
+  );
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
+  
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,7 +37,15 @@ class MyApp extends StatelessWidget {
         '/registroCliente': (context) => const RegistroClienteScreen(),
         '/shoppingCart': (context) => const ShoppingCartScreen(),
         '/product-list': (context) => ProductListScreen(),
-        '/product-detail': (context) => ProductDetailScreen(product: Product(id: '', name: '', description: '', price: 0.0, imageUrl: '')),
+        '/product-detail': (context) => ProductDetailScreen(
+          product: product_model.Product(
+            id: '', 
+            name: '', 
+            description: '', 
+            price: 0.0, 
+            imageUrl: '',
+          ),
+        ),
       },
     );
   }

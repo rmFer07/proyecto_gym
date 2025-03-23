@@ -13,6 +13,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  bool _isLoading = false; // Variable para controlar el estado de carga
 
   @override
   Widget build(BuildContext context) {
@@ -72,34 +73,42 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 10),
               TextButton(
-                onPressed: () {}, // Recuperación de contraseña (pendiente)
+                onPressed: () {}, // Implementar recuperación de contraseña
                 child: const Text("¿Olvidaste tu contraseña?",
                     style: TextStyle(color: Colors.white)),
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async{
-                  await AuthService().signin(
-                    email: emailController.text,
-                    password: passwordController.text,
-                    context: context);
-                },
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
-                child: const Text("Iniciar Sesión",
-                    style: TextStyle(color: Colors.black)),
-              ),
+              _isLoading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: () async {
+                        setState(() {
+                          _isLoading = true;
+                        });
+                        await AuthService().signin(
+                          email: emailController.text,
+                          password: passwordController.text,
+                          context: context,
+                        );
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
+                      child: const Text("Iniciar Sesión", style: TextStyle(color: Colors.black)),
+                    ),
               const SizedBox(height: 20),
-              const Text("¿No eres miembro?",
-                  style: TextStyle(color: Colors.white)),
+              const Text("¿No eres miembro?", style: TextStyle(color: Colors.white)),
               TextButton(
                 onPressed: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const RegisterScreen()));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const RegisterScreen(),
+                    ),
+                  );
                 },
-                child: const Text("Únete a nosotros",
-                    style: TextStyle(color: Colors.yellow)),
+                child: const Text("Únete a nosotros", style: TextStyle(color: Colors.yellow)),
               ),
             ],
           ),
