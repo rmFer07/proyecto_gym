@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class RegistroClienteScreen extends StatefulWidget {
-  const RegistroClienteScreen({super.key});
+  const RegistroClienteScreen({super.key}); 
 
   @override
   // ignore: library_private_types_in_public_api
