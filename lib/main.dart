@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:proyecto_gym/firebase_options.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
@@ -10,13 +11,22 @@ import 'screens/carrito_de_compras.dart';
 import 'screens/product_list_screen.dart';
 import 'screens/product_detail_screen.dart';
 import 'screens/models/product.dart' as product_model;
+import 'screens/providers/cart_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(const MyApp());
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => CartProvider()), // AÑADIDO
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

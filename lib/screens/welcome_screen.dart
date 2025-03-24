@@ -60,12 +60,13 @@ class WelcomeScreen extends StatelessWidget {
                     _buildMenuButton(
                         context, "Lista de Productos", ProductListScreen()),
                     _buildMenuButton(
-                        context, "Carrito de Compras", const ShoppingCartApp()),
+                        context, "Carrito de Compras", const ShoppingCartScreen()),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
                         await FirebaseAuth.instance.signOut();
                         Navigator.pushReplacement(
+                          // ignore: use_build_context_synchronously
                           context,
                           MaterialPageRoute(
                               builder: (context) => const LoginScreen()),

@@ -1,198 +1,119 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:proyecto_gym/screens/providers/cart_provider.dart'; // Asegúrate de que este archivo esté en la ruta correcta
 
-class ShoppingCartApp extends StatelessWidget {
-  const ShoppingCartApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Colors.teal,
-        colorScheme: const ColorScheme.light(
-          primary: Colors.teal,
-          secondary: Colors.tealAccent,
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF4F6F9),
-        textTheme: const TextTheme(
-          bodyLarge: TextStyle(color: Colors.black87),
-          bodyMedium: TextStyle(color: Colors.black54),
-          titleLarge: TextStyle(
-              fontSize: 22, fontWeight: FontWeight.bold, color: Colors.teal),
-        ),
-        buttonTheme: const ButtonThemeData(buttonColor: Colors.tealAccent),
-      ),
-      home: const ShoppingCartScreen(),
-    );
-  }
-}
-
-class ShoppingCartScreen extends StatefulWidget {
+class ShoppingCartScreen extends StatelessWidget {
   const ShoppingCartScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _ShoppingCartScreenState createState() => _ShoppingCartScreenState();
-}
-
-class _ShoppingCartScreenState extends State<ShoppingCartScreen> {
-  final List<Product> products = [
-    Product(
-      name: "GALLETAS DE PROTEINA",
-      price: 132.00,
-      quantity: 1,
-      id: '1',
-      description: 'Galletas ricas en proteína para un mejor rendimiento.',
-      imageUrl: 'assets/proteina.png',
-    ),
-    Product(
-      name: "SUERO DE ELITE",
-      price: 2600.00,
-      quantity: 1,
-      id: '2',
-      description: 'Suero de alta calidad para mejorar tu fuerza.',
-      imageUrl: 'assets/suero.png',
-    ),
-    Product(
-      name: "ISOPURE 3 LB",
-      price: 2497.00,
-      quantity: 1,
-      id: '3',
-      description: 'Proteína pura sin carbohidratos.',
-      imageUrl: 'assets/isopure.png',
-    ),
-    Product(
-      name: "ISOTOPE 5 LB",
-      price: 2699.00,
-      quantity: 1,
-      id: '4',
-      description: 'Suplemento de proteína para rendimiento.',
-      imageUrl: 'assets/isotope.png',
-    ),
-  ];
-
-  double get total =>
-      products.fold(0, (sum, item) => sum + (item.price * item.quantity));
-
-  void updateQuantity(int index, int change) {
-    setState(() {
-      products[index].quantity += change;
-      if (products[index].quantity < 1) products[index].quantity = 1;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final cartProvider = Provider.of<CartProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Carrito de Compras"),
-        backgroundColor: Colors.teal,
-        elevation: 5,
+        title: const Text("Carrito de Compras", style: TextStyle(fontWeight: FontWeight.bold)),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.shopping_cart)),
+          IconButton(
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () {},
+          ),
         ],
       ),
       body: Column(
         children: [
           Expanded(
-            child: ListView.builder(
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return Card(
-                  margin: const EdgeInsets.all(12.0),
-                  elevation: 8,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
+            child: cartProvider.items.isEmpty
+                ? const Center(child: Text("El carrito está vacío"))
+                : ListView.builder(
+                    itemCount: cartProvider.items.length,
+                    itemBuilder: (context, index) {
+                      final product = cartProvider.items[index];
+
+                      return Container(
+                        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.asset(
+                                product.imageUrl,
+                                width: 60,
+                                height: 60,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    product.name.toUpperCase(),
+                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    "L${product.price.toStringAsFixed(2)}",
+                                    style: const TextStyle(
+                                      color: Colors.green,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.remove_circle_outline),
+                                  onPressed: () {
+                                    cartProvider.decreaseQuantity(product.id);
+                                  },
+                                ),
+                                Text(
+                                  product.quantity.toString(),
+                                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.add_circle_outline),
+                                  onPressed: () {
+                                    cartProvider.increaseQuantity(product.id);
+                                  },
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      );
+                    },
                   ),
-                  color: Colors.white,
-                  child: ListTile(
-                    leading: const Icon(Icons.fitness_center,
-                        color: Colors.teal, size: 30),
-                    title: Text(
-                      product.name,
-                      style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black),
-                    ),
-                    subtitle: Text(
-                      "L${product.price.toStringAsFixed(2)}",
-                      style: TextStyle(color: Colors.green[700], fontSize: 16),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove, color: Colors.red),
-                          onPressed: () => updateQuantity(index, -1),
-                        ),
-                        Text(
-                          "${product.quantity}",
-                          style: const TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.teal),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add, color: Colors.green),
-                          onPressed: () => updateQuantity(index, 1),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
           ),
           Container(
-            padding: const EdgeInsets.all(20.0),
-            decoration: const BoxDecoration(
-              color: Colors.teal,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.green,
+              borderRadius: BorderRadius.circular(20),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "Total:",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                Text(
-                  "L${total.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
+            child: Text(
+              "Total: L ${cartProvider.totalPrice.toStringAsFixed(2)}",
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
             ),
           ),
         ],
       ),
     );
   }
-}
-
-class Product {
-  final String name;
-  final double price;
-  int quantity;
-  final String id;
-  final String description;
-  final String imageUrl;
-
-  Product({
-    required this.name,
-    required this.price,
-    this.quantity = 1,
-    required this.id,
-    required this.description,
-    required this.imageUrl,
-  });
 }
