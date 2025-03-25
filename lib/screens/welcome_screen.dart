@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
@@ -18,6 +20,60 @@ class WelcomeScreen extends StatelessWidget {
         backgroundColor: Colors.black,
         centerTitle: true,
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            // Encabezado del Drawer
+            DrawerHeader(
+              decoration: BoxDecoration(
+                color: Colors.black,
+              ),
+              child: Column(
+                children: [
+                  Image.asset('assets/logo.png', width: 100),
+                  const SizedBox(height: 10),
+                  const Text(
+                    "VALHALLA GYM",
+                    style: TextStyle(color: Colors.white, fontSize: 24),
+                  ),
+                ],
+              ),
+            ),
+            // Elementos del Drawer
+            _buildDrawerItem(
+                context, "Registrar Clientes", const RegistroClienteScreen()),
+            _buildDrawerItem(
+                context,
+                "Detalle del Producto",
+                ProductDetailScreen(
+                  product: product_model.Product(
+                    id: '1',
+                    name: "Producto de prueba",
+                    description: "Descripción de prueba",
+                    price: 0.0,
+                    imageUrl: "assets/placeholder.png",
+                  ),
+                )),
+            _buildDrawerItem(
+                context, "Lista de Productos", ProductListScreen()),
+            _buildDrawerItem(
+                context, "Carrito de Compras", const ShoppingCartScreen()),
+            const Divider(),
+            ListTile(
+              title: const Text("Cerrar Sesión",
+                  style: TextStyle(color: Colors.red)),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -25,62 +81,21 @@ class WelcomeScreen extends StatelessWidget {
             fit: BoxFit.cover,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-            Image.asset('assets/logo.png', width: 150),
-            const SizedBox(height: 20),
-            const Text(
-              "Bienvenido a VALHALLA GYM",
-              style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white),
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.5),
+              ),
             ),
-            const SizedBox(height: 40),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 50),
-                child: Column(
-                  children: [
-                    _buildMenuButton(context, "Registrar Clientes",
-                        const RegistroClienteScreen()),
-                    _buildMenuButton(
-                        context,
-                        "Detalle del Producto",
-                        ProductDetailScreen(
-                          product: product_model.Product(
-                            id: '1',
-                            name: "Producto de prueba",
-                            description: "Descripción de prueba",
-                            price: 0.0,
-                            imageUrl: "assets/placeholder.png",
-                          ),
-                        )),
-                    _buildMenuButton(
-                        context, "Lista de Productos", ProductListScreen()),
-                    _buildMenuButton(
-                        context, "Carrito de Compras", const ShoppingCartScreen()),
-                    const SizedBox(height: 20),
-                    ElevatedButton(
-                      onPressed: () async {
-                        await FirebaseAuth.instance.signOut();
-                        Navigator.pushReplacement(
-                          // ignore: use_build_context_synchronously
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => const LoginScreen()),
-                        );
-                      },
-                      style:
-                          ElevatedButton.styleFrom(backgroundColor: Colors.red),
-                      child: const Text(
-                        "Cerrar Sesión",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
+            // Contenido principal
+            Center(
+              child: const Text(
+                "Bienvenido a VALHALLA GYM",
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
             ),
           ],
@@ -89,19 +104,15 @@ class WelcomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuButton(BuildContext context, String title, Widget screen) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ElevatedButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => screen),
-          );
-        },
-        style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-        child: Text(title, style: const TextStyle(color: Colors.white)),
-      ),
+  Widget _buildDrawerItem(BuildContext context, String title, Widget screen) {
+    return ListTile(
+      title: Text(title),
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => screen),
+        );
+      },
     );
   }
 }

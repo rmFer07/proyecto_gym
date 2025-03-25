@@ -22,7 +22,7 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => CartProvider()), // AÑADIDO
+        ChangeNotifierProvider(create: (context) => CartProvider()),
       ],
       child: const MyApp(),
     ),
