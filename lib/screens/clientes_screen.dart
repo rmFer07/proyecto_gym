@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, use_super_parameters, use_build_context_synchronously
+// ignore_for_file: unused_local_variable, use_super_parameters, library_private_types_in_public_api
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -126,34 +126,9 @@ class _ClientesScreenState extends State<ClientesScreen> {
                   subtitle: Text('Código: $codigoCliente - Teléfono: $telefono',
                       style: const TextStyle(fontSize: 14)),
                   onTap: () => _mostrarInformacionCliente(cliente, clienteId),
-                  trailing: Wrap(
-                    spacing: 8,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blueAccent),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RegistroClienteScreen(
-                                clienteId: clienteId,
-                                nombre: nombre,
-                                apellido: apellido,
-                                telefono: telefono,
-                                tipoPago: tipoPago,
-                                fechaPago: fechaPago,
-                                fechaExpiracion: fechaExpiracion,
-                                codigoCliente: codigoCliente,
-                              ),
-                            ),
-                          ).then((_) => setState(() {}));
-                        },
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.redAccent),
-                        onPressed: () => _confirmarEliminacion(clienteId),
-                      ),
-                    ],
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.redAccent),
+                    onPressed: () => _confirmarEliminacion(clienteId),
                   ),
                 ),
               );
