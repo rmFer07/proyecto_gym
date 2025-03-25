@@ -14,21 +14,38 @@ class ProductDetailScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: Text(product.name)),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: Image.asset(product.imageUrl,
-                  width: 200, height: 200, fit: BoxFit.cover),
+              child: Image.asset(
+                product.imageUrl,
+                width: 200,
+                height: 200,
+                fit: BoxFit.cover,
+                // Añadimos un placeholder si la imagen no carga correctamente
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    'assets/logo.png', // Usa una imagen de placeholder
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  );
+                },
+              ),
             ),
-            SizedBox(height: 20),
-            Text(product.name,
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-            SizedBox(height: 10),
-            Text('Precio: \$${product.price.toStringAsFixed(2)}',
-                style: TextStyle(fontSize: 18, color: Colors.green)),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+            Text(
+              product.name,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Precio: \$${product.price.toStringAsFixed(2)}',
+              style: const TextStyle(fontSize: 18, color: Colors.green),
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -36,7 +53,7 @@ class ProductDetailScreen extends StatelessWidget {
                       content: Text('${product.name} agregado al carrito')),
                 );
               },
-              child: Text('Agregar al Carrito'),
+              child: const Text('Agregar al Carrito'),
             ),
           ],
         ),

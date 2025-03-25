@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_gym/screens/providers/cart_provider.dart'; // Asegúrate de que este archivo esté en la ruta correcta
@@ -30,18 +32,26 @@ class ShoppingCartScreen extends StatelessWidget {
         children: [
           Expanded(
             child: cartProvider.items.isEmpty
-                ? const Center(child: Text("El carrito está vacío"))
+                ? const Center(child: Text("El carrito está vacío", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey)))
                 : ListView.builder(
                     itemCount: cartProvider.items.length,
                     itemBuilder: (context, index) {
                       final product = cartProvider.items[index];
 
                       return Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                        padding: const EdgeInsets.all(10),
+                        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                        padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              spreadRadius: 1,
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
                         child: Row(
                           children: [
@@ -49,8 +59,8 @@ class ShoppingCartScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8),
                               child: Image.asset(
                                 product.imageUrl,
-                                width: 60,
-                                height: 60,
+                                width: 80,
+                                height: 80,
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -61,10 +71,15 @@ class ShoppingCartScreen extends StatelessWidget {
                                 children: [
                                   Text(
                                     product.name.toUpperCase(),
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.black87,
+                                    ),
                                   ),
+                                  const SizedBox(height: 6),
                                   Text(
-                                    "L${product.price.toStringAsFixed(2)}",
+                                    "L ${product.price.toStringAsFixed(2)}",
                                     style: const TextStyle(
                                       color: Colors.green,
                                       fontWeight: FontWeight.bold,
@@ -101,15 +116,15 @@ class ShoppingCartScreen extends StatelessWidget {
                   ),
           ),
           Container(
-            margin: const EdgeInsets.all(16),
-            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
               color: Colors.green,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
               "Total: L ${cartProvider.totalPrice.toStringAsFixed(2)}",
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
             ),
           ),
         ],

@@ -43,29 +43,38 @@ class WelcomeScreen extends StatelessWidget {
             ),
             // Elementos del Drawer
             _buildDrawerItem(
-                context, "Registrar Clientes", const RegistroClienteScreen(clienteId: '', apellido: null, nombre: null, tipoPago: null, telefono: null, fechaPago: null, fechaExpiracion: null, codigoCliente: null,)),
+              context,
+              "Registrar Clientes",
+              const RegistroClienteScreen(
+                clienteId: '',
+                apellido: null,
+                nombre: null,
+                tipoPago: null,
+                telefono: null,
+                fechaPago: null,
+                fechaExpiracion: null,
+                codigoCliente: null,
+              ),
+            ),
+            _buildDrawerItem(context, "Ver Clientes", const ClientesScreen()),
             _buildDrawerItem(
-                context,
-                "Detalle del Producto",
-                ProductDetailScreen(
-                  product: product_model.Product(
-                    id: '1',
-                    name: "Producto de prueba",
-                    description: "Descripción de prueba",
-                    price: 0.0,
-                    imageUrl: "assets/placeholder.png",
-                  ),
-                )),
-            _buildDrawerItem(
-                context, "Lista de Productos", ProductListScreen()),
-            _buildDrawerItem(
-                context, "Carrito de Compras", const ShoppingCartScreen()),
-            _buildDrawerItem(
-                context, "Ver Clientes", const ClientesScreen()),  // Nueva opción para clientes
+              context,
+              "Detalle del Producto",
+              ProductDetailScreen(
+                product: product_model.Product(
+                  id: '1',
+                  name: "Producto de prueba",
+                  description: "Descripción de prueba",
+                  price: 0.0,
+                  imageUrl: "assets/placeholder.png",
+                ),
+              ),
+            ),
+            _buildDrawerItem(context, "Lista de Productos", ProductListScreen()),
+            _buildDrawerItem(context, "Carrito de Compras", const ShoppingCartScreen()),
             const Divider(),
             ListTile(
-              title: const Text("Cerrar Sesión",
-                  style: TextStyle(color: Colors.red)),
+              title: const Text("Cerrar Sesión", style: TextStyle(color: Colors.red)),
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushReplacement(
@@ -92,14 +101,30 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
             // Contenido principal
-            Center(
-              child: const Text(
-                "Bienvenido a VALHALLA GYM",
-                style: TextStyle(
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "Bienvenido a VALHALLA GYM",
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white),
-              ),
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Center(
+                  child: const Text(
+                    "Tu viaje hacia una vida más saludable comienza hoy. ¡Vamos a lograrlo juntos!",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center, // Esto alinea el texto al centro
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -111,10 +136,13 @@ class WelcomeScreen extends StatelessWidget {
     return ListTile(
       title: Text(title),
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => screen),
-        );
+        Navigator.pop(context); // Cerrar el Drawer antes de navegar
+        Future.delayed(Duration(milliseconds: 200), () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => screen),
+          );
+        });
       },
     );
   }

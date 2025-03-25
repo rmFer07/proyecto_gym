@@ -68,14 +68,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.shopping_cart),
-            onPressed: () {
-              Navigator.pushNamed(context, '/cart');
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -110,7 +102,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
                 return Container(
                   decoration: BoxDecoration(
-                    color: Colors.red[200],
+                    color: Colors.white10,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(

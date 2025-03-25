@@ -4,9 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:proyecto_gym/main.dart' show showNotification;
 
 class RegistroClienteScreen extends StatefulWidget {
-  const RegistroClienteScreen({super.key, required String clienteId, required apellido, required nombre, required telefono, required tipoPago, required fechaPago, required fechaExpiracion, required codigoCliente});
+  const RegistroClienteScreen(
+      {super.key,
+      required String clienteId,
+      required apellido,
+      required nombre,
+      required telefono,
+      required tipoPago,
+      required fechaPago,
+      required fechaExpiracion,
+      required codigoCliente});
 
   @override
   _RegistroClienteScreenState createState() => _RegistroClienteScreenState();
@@ -82,9 +92,13 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Cliente registrado correctamente en Firestore!'),
+            content: Text('Cliente registrado correctamente!'),
           ),
         );
+
+        // Llamar a la notificación
+        showNotification("Cliente Registrado",
+            "El cliente ${_nombreController.text} ha sido registrado correctamente.");
 
         setState(() {
           _codigoController.text =
