@@ -1,19 +1,22 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:proyecto_gym/services/auth_device.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _RegisterScreenState createState() => _RegisterScreenState();
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
   bool _isLoading = false;
 
   @override
@@ -25,7 +28,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset('assets/assets/logo.png', width: 120),
+            Image.asset(
+              'assets/logo.png',
+              height: 190,
+            ),
             const SizedBox(height: 20),
             TextField(
               controller: emailController,
@@ -63,7 +69,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
                     onPressed: () async {
-                      // Validación de campos
                       if (emailController.text.isEmpty ||
                           passwordController.text.isEmpty ||
                           confirmPasswordController.text.isEmpty) {
@@ -78,8 +83,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         return;
                       }
 
-                      // Verificación de que las contraseñas coincidan
-                      if (passwordController.text != confirmPasswordController.text) {
+                      if (passwordController.text !=
+                          confirmPasswordController.text) {
                         Fluttertoast.showToast(
                           msg: "Las contraseñas no coinciden.",
                           toastLength: Toast.LENGTH_SHORT,
@@ -95,7 +100,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         _isLoading = true;
                       });
 
-                      // Intentar registrar al usuario
                       await AuthService().signup(
                         email: emailController.text,
                         password: passwordController.text,
@@ -106,9 +110,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         _isLoading = false;
                       });
                     },
-                    style: ElevatedButton.styleFrom(backgroundColor: Colors.yellow),
-                    child: const Text("Registrar", style: TextStyle(color: Colors.black)),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.yellow),
+                    child: const Text("Registrar",
+                        style: TextStyle(color: Colors.black)),
                   ),
+            const SizedBox(height: 20),
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                );
+              },
+              child: const Text(
+                "¿Ya tienes una cuenta? Inicia sesión",
+                style: TextStyle(color: Colors.yellow),
+              ),
+            ),
           ],
         ),
       ),

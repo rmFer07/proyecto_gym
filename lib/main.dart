@@ -44,7 +44,7 @@ class MyApp extends StatelessWidget {
         '/welcome': (context) => const WelcomeScreen(),
         '/register': (context) => const RegisterScreen(),
         '/notifications': (context) => NotificationScreen(),
-        '/registroCliente': (context) => const RegistroClienteScreen(),
+        '/registroCliente': (context) => const RegistroClienteScreen(clienteId: '', apellido: null, nombre: null, telefono: null, tipoPago: null, fechaPago: null, fechaExpiracion: null, codigoCliente: null,),
         '/shoppingCart': (context) => const ShoppingCartScreen(),
         '/product-list': (context) => ProductListScreen(),
         '/product-detail': (context) => ProductDetailScreen(

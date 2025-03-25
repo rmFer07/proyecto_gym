@@ -1,11 +1,14 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class RegistroClienteScreen extends StatefulWidget {
-  const RegistroClienteScreen({super.key}); 
+  const RegistroClienteScreen({super.key, required String clienteId, required apellido, required nombre, required telefono, required tipoPago, required fechaPago, required fechaExpiracion, required codigoCliente});
 
   @override
-  // ignore: library_private_types_in_public_api
   _RegistroClienteScreenState createState() => _RegistroClienteScreenState();
 }
 
@@ -16,15 +19,14 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
   final TextEditingController _telefonoController = TextEditingController();
   final TextEditingController _codigoController = TextEditingController();
 
-  String? _pagoSeleccionado = 'Dia'; // Valor por defecto
+  String? _pagoSeleccionado = 'Dia';
   DateTime? _fechaPago;
   DateTime? _fechaExpiracion;
-  int _codigoCliente = 1; // Primer código
 
   @override
   void initState() {
     super.initState();
-    _codigoController.text = _codigoCliente.toString().padLeft(3, '0');
+    _codigoController.text = '001'; // Inicializa el código en 001
   }
 
   @override
@@ -36,53 +38,91 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
     super.dispose();
   }
 
-  Future<void> _seleccionarFecha(BuildContext context, Function(DateTime) onSelected) async {
-    final DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-      locale: const Locale('es', 'ES'),
+  void _seleccionarFecha(BuildContext context, Function(DateTime) onSelected) {
+    DatePicker.showDatePicker(
+      context,
+      showTitleActions: true,
+      onConfirm: (date) {
+        setState(() {
+          onSelected(date);
+        });
+      },
+      currentTime: DateTime.now(),
+      locale: LocaleType.es,
     );
+  }
 
-    if (pickedDate != null && pickedDate != _fechaPago && pickedDate != _fechaExpiracion) {
-      setState(() {
-        onSelected(pickedDate);
-      });
+  Future<void> _registrarCliente() async {
+    if (_formKey.currentState!.validate()) {
+      if (_fechaExpiracion != null &&
+          _fechaPago != null &&
+          _fechaExpiracion!.isBefore(_fechaPago!)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'La fecha de expiración debe ser posterior a la fecha de pago.'),
+          ),
+        );
+        return;
+      }
+
+      try {
+        // Generar un nuevo código de cliente
+        int nuevoCodigoCliente = await _generarCodigoCliente();
+
+        await FirebaseFirestore.instance.collection('clientes').add({
+          'nombre': _nombreController.text,
+          'apellido': _apellidoController.text,
+          'telefono': _telefonoController.text,
+          'tipo_pago': _pagoSeleccionado,
+          'fecha_pago': _fechaPago?.toIso8601String(),
+          'fecha_expiracion': _fechaExpiracion?.toIso8601String(),
+          'codigo_cliente': nuevoCodigoCliente,
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Cliente registrado correctamente en Firestore!'),
+          ),
+        );
+
+        setState(() {
+          _codigoController.text =
+              nuevoCodigoCliente.toString().padLeft(3, '0');
+          _nombreController.clear();
+          _apellidoController.clear();
+          _telefonoController.clear();
+          _pagoSeleccionado = 'Dia';
+          _fechaPago = null;
+          _fechaExpiracion = null;
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al registrar cliente: $e'),
+          ),
+        );
+      }
     }
   }
 
-  void _registrarCliente() {
-    if (_formKey.currentState!.validate()) {
-      // Validar que la fecha de expiración sea posterior a la fecha de pago
-      if (_fechaExpiracion != null && _fechaPago != null && _fechaExpiracion!.isBefore(_fechaPago!)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('La fecha de expiración debe ser posterior a la fecha de pago.'),
-          ),
-        );
-        return; // Salir de la función si la validación falla
-      }
+  // Función para generar un nuevo código de cliente
+  Future<int> _generarCodigoCliente() async {
+    // Obtén todos los documentos de la colección 'clientes'
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('clientes').get();
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cliente registrado'),
-        ),
-      );
+    // Extrae los códigos de cliente existentes
+    List<int> codigosExistentes =
+        snapshot.docs.map((doc) => doc['codigo_cliente'] as int).toList();
 
-      // Incrementa el código para el siguiente cliente
-      setState(() {
-        _codigoCliente++;
-        _codigoController.text = _codigoCliente.toString().padLeft(3, '0');
-        // Limpiar los campos después de registrar
-        _nombreController.clear();
-        _apellidoController.clear();
-        _telefonoController.clear();
-        _pagoSeleccionado = 'Dia';
-        _fechaPago = null;
-        _fechaExpiracion = null;
-      });
+    // Encuentra el siguiente código disponible
+    int nuevoCodigo = 1; // Comienza desde 1 o el número que desees
+    while (codigosExistentes.contains(nuevoCodigo)) {
+      nuevoCodigo++;
     }
+
+    return nuevoCodigo;
   }
 
   @override
@@ -99,20 +139,20 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
             children: [
               TextFormField(
                 controller: _nombreController,
-                decoration: const InputDecoration(labelText: 'Nombres'),
+                decoration: const InputDecoration(labelText: 'Nombre'),
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Por favor ingrese los nombres';
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingresa un nombre';
                   }
                   return null;
                 },
               ),
               TextFormField(
                 controller: _apellidoController,
-                decoration: const InputDecoration(labelText: 'Apellidos'),
+                decoration: const InputDecoration(labelText: 'Apellido'),
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Por favor ingrese los apellidos';
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingresa un apellido';
                   }
                   return null;
                 },
@@ -120,55 +160,61 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
               TextFormField(
                 controller: _telefonoController,
                 decoration: const InputDecoration(labelText: 'Teléfono'),
-                keyboardType: TextInputType.phone,
                 validator: (value) {
-                  if (value!.isEmpty) {
-                    return 'Por favor ingrese un teléfono';
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor ingresa un teléfono';
                   }
                   return null;
                 },
               ),
               DropdownButtonFormField<String>(
                 value: _pagoSeleccionado,
-                onChanged: (newValue) {
-                  setState(() {
-                    _pagoSeleccionado = newValue ;
-                  });
-                },
-                items: ['Dia', 'Semana', 'Mes'].map((tipo) {
-                  return DropdownMenuItem(
-                    value: tipo,
-                    child: Text(tipo),
+                items: <String>['Dia', 'Semana', 'Mes']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
                   );
                 }).toList(),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _pagoSeleccionado = newValue;
+                  });
+                },
                 decoration: const InputDecoration(labelText: 'Tipo de Pago'),
               ),
-              if (_pagoSeleccionado != 'Dia')
-                TextFormField(
-                  controller: _codigoController,
-                  enabled: false,
-                  decoration: const InputDecoration(labelText: 'Código Cliente'),
-                ),
-              ListTile(
-                title: Text(
-                    'Fecha de Pago: ${_fechaPago != null ? DateFormat('yyyy-MM-dd').format(_fechaPago!) : 'Seleccionar'}'),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () => _seleccionarFecha(context, (date) {
-                  _fechaPago = date;
-                }),
-              ),
-              ListTile(
-                title: Text(
-                    'Fecha de Expiración: ${_fechaExpiracion != null ? DateFormat('yyyy-MM-dd').format(_fechaExpiracion!) : 'Seleccionar'}'),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () => _seleccionarFecha(context, (date) {
-                  _fechaExpiracion = date;
-                }),
-              ),
-              ElevatedButton(
+              const SizedBox(height: 20),
+              TextButton(
                 onPressed: () {
-                  _registrarCliente();
+                  _seleccionarFecha(context, (fecha) {
+                    setState(() {
+                      _fechaPago = fecha;
+                    });
+                  });
                 },
+                child: Text(
+                  _fechaPago == null
+                      ? 'Seleccionar Fecha de Pago'
+                      : 'Fecha de Pago: ${DateFormat('dd/MM/yyyy').format(_fechaPago!)}',
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  _seleccionarFecha(context, (fecha) {
+                    setState(() {
+                      _fechaExpiracion = fecha;
+                    });
+                  });
+                },
+                child: Text(
+                  _fechaExpiracion == null
+                      ? 'Seleccionar Fecha de Expiración'
+                      : 'Fecha de Expiración: ${DateFormat('dd/MM/yyyy').format(_fechaExpiracion!)}',
+                ),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _registrarCliente,
                 child: const Text('Registrar Cliente'),
               ),
             ],

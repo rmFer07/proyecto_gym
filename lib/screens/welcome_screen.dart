@@ -1,4 +1,4 @@
-// ignore_for_file: deprecated_member_use, use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
 
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,6 +8,7 @@ import 'registro_clientes.dart';
 import 'product_detail_screen.dart';
 import 'product_list_screen.dart';
 import 'carrito_de_compras.dart';
+import 'clientes_screen.dart';  // Asegúrate de importar el archivo ClientesScreen
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -42,7 +43,7 @@ class WelcomeScreen extends StatelessWidget {
             ),
             // Elementos del Drawer
             _buildDrawerItem(
-                context, "Registrar Clientes", const RegistroClienteScreen()),
+                context, "Registrar Clientes", const RegistroClienteScreen(clienteId: '', apellido: null, nombre: null, tipoPago: null, telefono: null, fechaPago: null, fechaExpiracion: null, codigoCliente: null,)),
             _buildDrawerItem(
                 context,
                 "Detalle del Producto",
@@ -59,6 +60,8 @@ class WelcomeScreen extends StatelessWidget {
                 context, "Lista de Productos", ProductListScreen()),
             _buildDrawerItem(
                 context, "Carrito de Compras", const ShoppingCartScreen()),
+            _buildDrawerItem(
+                context, "Ver Clientes", const ClientesScreen()),  // Nueva opción para clientes
             const Divider(),
             ListTile(
               title: const Text("Cerrar Sesión",
