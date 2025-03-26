@@ -136,6 +136,7 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
                 ? doc['codigo_cliente'] as int
                 : int.tryParse(doc['codigo_cliente'].toString()) ?? 0;
           } catch (e) {
+            // ignore: avoid_print
             print('Error al convertir el código: $e');
             return 0; // Si ocurre un error, asignamos un valor por defecto
           }
