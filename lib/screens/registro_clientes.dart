@@ -7,16 +7,17 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:proyecto_gym/main.dart' show showNotification;
 
 class RegistroClienteScreen extends StatefulWidget {
-  const RegistroClienteScreen(
-      {super.key,
-      required String clienteId,
-      required apellido,
-      required nombre,
-      required telefono,
-      required tipoPago,
-      required fechaPago,
-      required fechaExpiracion,
-      required codigoCliente});
+  const RegistroClienteScreen({
+    super.key,
+    required String clienteId,
+    required apellido,
+    required nombre,
+    required telefono,
+    required tipoPago,
+    required fechaPago,
+    required fechaExpiracion,
+    required codigoCliente,
+  });
 
   @override
   _RegistroClienteScreenState createState() => _RegistroClienteScreenState();
@@ -70,7 +71,8 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-                'La fecha de expiración debe ser posterior a la fecha de pago.'),
+              'La fecha de expiración debe ser posterior a la fecha de pago.',
+            ),
           ),
         );
         return;
@@ -91,18 +93,20 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Cliente registrado correctamente!'),
-          ),
+          const SnackBar(content: Text('Cliente registrado correctamente!')),
         );
 
         // Llamar a la notificación
-        showNotification("Cliente Registrado",
-            "El cliente ${_nombreController.text} ha sido registrado correctamente.");
+        showNotification(
+          "Cliente Registrado",
+          "El cliente ${_nombreController.text} ha sido registrado correctamente.",
+        );
 
         setState(() {
-          _codigoController.text =
-              nuevoCodigoCliente.toString().padLeft(3, '0');
+          _codigoController.text = nuevoCodigoCliente.toString().padLeft(
+            3,
+            '0',
+          );
           _nombreController.clear();
           _apellidoController.clear();
           _telefonoController.clear();
@@ -112,15 +116,12 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
         });
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error al registrar cliente: $e'),
-          ),
+          SnackBar(content: Text('Error al registrar cliente: $e')),
         );
       }
     }
   }
 
-  // Función para generar un nuevo código de cliente
   Future<int> _generarCodigoCliente() async {
     // Obtén todos los documentos de la colección 'clientes'
     QuerySnapshot snapshot =
@@ -128,7 +129,17 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
 
     // Extrae los códigos de cliente existentes
     List<int> codigosExistentes =
-        snapshot.docs.map((doc) => doc['codigo_cliente'] as int).toList();
+        snapshot.docs.map((doc) {
+          try {
+            // Intenta convertir a int
+            return doc['codigo_cliente'] is int
+                ? doc['codigo_cliente'] as int
+                : int.tryParse(doc['codigo_cliente'].toString()) ?? 0;
+          } catch (e) {
+            print('Error al convertir el código: $e');
+            return 0; // Si ocurre un error, asignamos un valor por defecto
+          }
+        }).toList();
 
     // Encuentra el siguiente código disponible
     int nuevoCodigo = 1; // Comienza desde 1 o el número que desees
@@ -142,9 +153,7 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Registro de Cliente'),
-      ),
+      appBar: AppBar(title: const Text('Registro de Cliente')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
@@ -183,13 +192,17 @@ class _RegistroClienteScreenState extends State<RegistroClienteScreen> {
               ),
               DropdownButtonFormField<String>(
                 value: _pagoSeleccionado,
-                items: <String>['Dia', 'Semana', 'Mes']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+                items:
+                    <String>[
+                      'Dia',
+                      'Semana',
+                      'Mes',
+                    ].map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
                 onChanged: (String? newValue) {
                   setState(() {
                     _pagoSeleccionado = newValue;

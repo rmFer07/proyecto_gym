@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:proyecto_gym/firebase_options.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart'; // Importación de notificaciones locales
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:proyecto_gym/screens/edit_cliente_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
 import 'screens/welcome_screen.dart';
@@ -16,18 +18,14 @@ import 'screens/providers/cart_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   // Inicializar notificaciones locales
   await _initNotifications();
 
   runApp(
     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => CartProvider()),
-      ],
+      providers: [ChangeNotifierProvider(create: (context) => CartProvider())],
       child: const MyApp(),
     ),
   );
@@ -53,14 +51,15 @@ Future<void> _initNotifications() async {
 Future<void> showNotification(String title, String body) async {
   const AndroidNotificationDetails androidPlatformChannelSpecifics =
       AndroidNotificationDetails(
-    'your_channel_id',
-    'your_channel_name',
-    channelDescription: 'your_channel_description',
-    importance: Importance.max,
-    priority: Priority.high,
+        'your_channel_id',
+        'your_channel_name',
+        channelDescription: 'your_channel_description',
+        importance: Importance.max,
+        priority: Priority.high,
+      );
+  const NotificationDetails platformChannelSpecifics = NotificationDetails(
+    android: androidPlatformChannelSpecifics,
   );
-  const NotificationDetails platformChannelSpecifics =
-      NotificationDetails(android: androidPlatformChannelSpecifics);
 
   await flutterLocalNotificationsPlugin.show(
     0,
@@ -73,6 +72,8 @@ Future<void> showNotification(String title, String body) async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  
+  get cliente => null;
 
   @override
   Widget build(BuildContext context) {
@@ -82,11 +83,27 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark(),
       initialRoute: '/login',
       routes: {
+        '/editCliente':
+            (context) => EditClienteScreen(
+              clienteId: '',
+              nombre: '',
+              apellido: '',
+              telefono: '',
+              tipoPago: '',
+              fechaPago:
+                  cliente['fecha_pago']
+                      as Timestamp, // Asegúrate de que sea Timestamp
+              fechaExpiracion:
+                  cliente['fecha_expiracion']
+                      as Timestamp, // Asegúrate de que sea Timestamp
+              codigoCliente: '',
+            ),
         '/login': (context) => const LoginScreen(),
         '/welcome': (context) => const WelcomeScreen(),
         '/register': (context) => const RegisterScreen(),
         '/notifications': (context) => NotificationScreen(),
-        '/registroCliente': (context) => const RegistroClienteScreen(
+        '/registroCliente':
+            (context) => const RegistroClienteScreen(
               clienteId: '',
               apellido: null,
               nombre: null,
@@ -98,7 +115,8 @@ class MyApp extends StatelessWidget {
             ),
         '/shoppingCart': (context) => const ShoppingCartScreen(),
         '/product-list': (context) => ProductListScreen(),
-        '/product-detail': (context) => ProductDetailScreen(
+        '/product-detail':
+            (context) => ProductDetailScreen(
               product: product_model.Product(
                 id: '',
                 name: '',

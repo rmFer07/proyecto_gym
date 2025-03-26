@@ -3,9 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'login_screen.dart';
-import 'models/product.dart' as product_model;
 import 'registro_clientes.dart';
-import 'product_detail_screen.dart';
 import 'product_list_screen.dart';
 import 'carrito_de_compras.dart';
 import 'clientes_screen.dart';  // Asegúrate de importar el archivo ClientesScreen
@@ -57,19 +55,6 @@ class WelcomeScreen extends StatelessWidget {
               ),
             ),
             _buildDrawerItem(context, "Ver Clientes", const ClientesScreen()),
-            _buildDrawerItem(
-              context,
-              "Detalle del Producto",
-              ProductDetailScreen(
-                product: product_model.Product(
-                  id: '1',
-                  name: "Producto de prueba",
-                  description: "Descripción de prueba",
-                  price: 0.0,
-                  imageUrl: "assets/placeholder.png",
-                ),
-              ),
-            ),
             _buildDrawerItem(context, "Lista de Productos", ProductListScreen()),
             _buildDrawerItem(context, "Carrito de Compras", const ShoppingCartScreen()),
             const Divider(),
